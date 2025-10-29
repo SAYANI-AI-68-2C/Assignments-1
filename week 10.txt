@@ -1,0 +1,32 @@
+# ===============================
+# Company Practice Assignment Solutions (Python)
+# ===============================
+
+#--------------------------------
+#1. LRU Cache
+#--------------------------------
+# Use LRUCache class from Week 6
+
+#--------------------------------
+#2. Top K frequent elements
+#--------------------------------
+from collections import Counter
+def topKFrequent(nums, k):
+    c = Counter(nums)
+    return [x for x,_ in c.most_common(k)]
+
+#--------------------------------
+#3. Max rectangle in binary matrix
+#--------------------------------
+def largestRectangleHist(heights):
+    stack=[]; maxA=0
+    for i,h in enumerate(heights+[0]):
+        while stack and heights[stack[-1]]>h:
+            H=heights[stack.pop()]
+            L=stack[-1]+1 if stack else 0
+            maxA=max(maxA,H*(i-L))
+        stack.append(i)
+    return maxA
+def maxRectangle(matrix):
+    if not matrix: return 0
+    n=len(matrix[0]); heights=[0]*n; ans=0
