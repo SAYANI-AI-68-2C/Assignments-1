@@ -1,2 +1,3 @@
-# Assignments-1
+# Assignments
+
 Assignment of DSA (UEMK_2ndYear)
