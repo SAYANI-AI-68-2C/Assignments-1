@@ -1,0 +1,181 @@
+# ===============================
+# Queue Assignment Solutions (Python)
+# ===============================
+
+#--------------------------------
+#1. Implement queue using array
+#--------------------------------
+class QueueArray:
+    def __init__(self, capacity=100):
+        self.arr = [None] * capacity
+        self.cap = capacity
+        self.front = -1
+        self.rear = -1
+    def isEmpty(self):
+        return self.front == -1
+    def enqueue(self, x):
+        if (self.rear + 1) % self.cap == self.front:
+            raise Exception("Queue Full")
+        if self.isEmpty():
+            self.front = 0
+        self.rear = (self.rear + 1) % self.cap
+        self.arr[self.rear] = x
+    def dequeue(self):
+        if self.isEmpty():
+            raise Exception("Queue Empty")
+        val = self.arr[self.front]
+        if self.front == self.rear:
+            self.front = self.rear = -1
+        else:
+            self.front = (self.front + 1) % self.cap
+        return val
+    def peek(self):
+        if self.isEmpty(): return None
+        return self.arr[self.front]
+
+#--------------------------------
+#2. Implement queue using linked list
+#--------------------------------
+class QNode:
+    def __init__(self, val):
+        self.val = val
+        self.next = None
+class QueueLinkedList:
+    def __init__(self):
+        self.head = None
+        self.tail = None
+    def enqueue(self, x):
+        node = QNode(x)
+        if not self.tail:
+            self.head = self.tail = node
+        else:
+            self.tail.next = node
+            self.tail = node
+    def dequeue(self):
+        if not self.head:
+            raise Exception("Queue Empty")
+        val = self.head.val
+        self.head = self.head.next
+        if not self.head:
+            self.tail = None
+        return val
+    def isEmpty(self):
+        return self.head is None
+
+#--------------------------------
+#3. Circular queue (circular tour)
+#--------------------------------
+def canCompleteTour(petrol, dist):
+    n = len(petrol)
+    start = 0
+    surplus = 0
+    deficit = 0
+    for i in range(n):
+        surplus += petrol[i] - dist[i]
+        if surplus < 0:
+            start = i + 1
+            deficit += surplus
+            surplus = 0
+    return start if surplus + deficit >= 0 and start < n else -1
+
+#--------------------------------
+#4. Queue using two stacks
+#--------------------------------
+class QueueTwoStacks:
+    def __init__(self):
+        self.s1 = []
+        self.s2 = []
+    def enqueue(self, x):
+        self.s1.append(x)
+    def dequeue(self):
+        if not self.s2:
+            while self.s1:
+                self.s2.append(self.s1.pop())
+        if not self.s2:
+            raise Exception("Queue Empty")
+        return self.s2.pop()
+    def isEmpty(self):
+        return not (self.s1 or self.s2)
+
+#--------------------------------
+#5. LRU cache
+#--------------------------------
+from collections import OrderedDict
+class LRUCache:
+    def __init__(self, capacity):
+        self.cap = capacity
+        self.od = OrderedDict()
+    def get(self, key):
+        if key not in self.od: return -1
+        self.od.move_to_end(key)
+        return self.od[key]
+    def put(self, key, val):
+        if key in self.od: self.od.move_to_end(key)
+        self.od[key] = val
+        if len(self.od) > self.cap: self.od.popitem(last=False)
+
+#--------------------------------
+#6. Reverse first K elements of queue
+#--------------------------------
+from collections import deque
+def reverseFirstK(q, k):
+    if k > len(q) or k <= 0: return q
+    stack = []
+    for _ in range(k): stack.append(q.popleft())
+    while stack: q.appendleft(stack.pop())
+    for _ in range(len(q) - k): q.append(q.popleft())
+    return q
+
+#--------------------------------
+#7. Interleave halves of queue
+#--------------------------------
+def interleaveQueue(q):
+    n = len(q)
+    half = n // 2
+    first = [q.popleft() for _ in range(half)]
+    res = deque()
+    for i in range(half):
+        res.append(first[i])
+        if q: res.append(q.popleft())
+    if n % 2: res.append(q.popleft())
+    return res
+
+#--------------------------------
+#8. First non-repeating character in a stream
+#--------------------------------
+from collections import Counter
+def firstNonRepeatingStream(stream):
+    freq = Counter(); q = deque(); res = []
+    for ch in stream:
+        freq[ch] += 1
+        q.append(ch)
+        while q and freq[q[0]] > 1: q.popleft()
+        res.append(q[0] if q else -1)
+    return res
+
+#--------------------------------
+#9. Rotten oranges (BFS)
+#--------------------------------
+def rottenOranges(grid):
+    if not grid: return -1
+    n, m = len(grid), len(grid[0])
+    q = deque(); fresh = 0
+    for i in range(n):
+        for j in range(m):
+            if grid[i][j] == 2: q.append((i, j, 0))
+            elif grid[i][j] == 1: fresh += 1
+    dirs = [(1,0),(-1,0),(0,1),(0,-1)]
+    time = 0
+    while q:
+        i, j, t = q.popleft(); time = max(time, t)
+        for di, dj in dirs:
+            ni, nj = i+di, j+dj
+            if 0<=ni<n and 0<=nj<m and grid[ni][nj]==1:
+                grid[ni][nj]=2; fresh-=1
+                q.append((ni,nj,t+1))
+    return time if fresh==0 else -1
+
+#--------------------------------
+#10. Hackerrank: Queue using two stacks
+#--------------------------------
+# Use QueueTwoStacks defined above.
